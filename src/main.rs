@@ -127,6 +127,10 @@ fn main() -> AppExit {
             // crate::ambient_sound::AmbientSoundPlugin,
             crate::session::SessionPlugin,
             crate::gui::GuiPlugin,
+            /*
+                bevy::diagnostic::FrameTimeDiagnosticsPlugin::default(),
+                bevy::diagnostic::LogDiagnosticsPlugin::default(),
+            */
         ))
         .add_systems(Update, VirtualTimer::sys_tick)
         .add_systems(FixedUpdate, FixedTimer::sys_tick)

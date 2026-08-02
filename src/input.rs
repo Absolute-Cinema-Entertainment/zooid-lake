@@ -8,6 +8,7 @@ use bevy::{
     core_pipeline::tonemapping::Tonemapping,
     ecs::relationship::Relationship,
     input::common_conditions::input_just_pressed,
+    light::cluster::ClusterConfig,
     math::{I64Vec2, U8Vec2, u8vec2},
     pbr::{ScreenSpaceTransmission, ScreenSpaceTransmissionQuality},
     picking::PickingSettings,
@@ -370,5 +371,6 @@ fn sys_startup(mut commands: Commands, window: Single<Entity, With<Window>>) {
             ..default()
         },
         PhysicsPickable,
+        ClusterConfig::Single,
     ));
 }
