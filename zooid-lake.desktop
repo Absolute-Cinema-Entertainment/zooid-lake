@@ -1,0 +1,26 @@
+[Desktop Entry]
+Comment[sv_SE]=
+Comment=
+# TODO
+Exec=
+GenericName[sv_SE]=
+GenericName=
+Icon=system-run
+MimeType=
+# TODO
+Name[sv_SE]=
+# TODO
+Name=
+# TODO
+Path=
+StartupNotify=true
+StartupWMClass=zooid-lake
+Terminal=false
+TerminalOptions=
+Type=Application
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+DBusActivatable=false
+Categories=Game;
+PrefersNonDefaultGPU=true
+# We might want `SingleMainWindow=true` later if it makes sessions more manageable.

@@ -1,0 +1,16 @@
+.vscode
+.zed
+*.kra~*
+
+# Runtime
+/latest.log
+
+# Cargo
+/target
+/Cargo.lock
+
+# Mac stuff
+.DS_Store
+
+# Trunk
+/dist

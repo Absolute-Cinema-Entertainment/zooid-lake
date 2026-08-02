@@ -1,0 +1,99 @@
+use std::time::Duration;
+
+use avian2d::prelude::*;
+use bevy::prelude::*;
+
+use crate::{
+    FixedTimer, PhysicsLayers,
+    shared_assets::{MaterialId, MeshId, ShapeId, SharedMaterials, SharedMeshes, SharedShapes},
+};
+
+/// Marker component attached to all projectiles.
+#[derive(Clone, Component, Copy, Default, Eq, PartialEq, Hash)]
+#[expect(clippy::duplicated_attributes, reason = "False positive")]
+#[require(
+    RigidBody::Dynamic,
+    CollisionLayers::new(PhysicsLayers::Damage, PhysicsLayers::Damage),
+    Sensor,
+    CollisionEventsEnabled,
+    AngularInertia(1.0),
+    CenterOfMass::ZERO,
+    Mass(1.0)
+)]
+#[component(immutable)]
+pub struct Projectile;
+impl Projectile {
+    /// Despawning of projectiles which have existed longer than their [`ProjectileKind::LIFESPAN`].
+    pub(super) fn sys_despawn(
+        mut commands: Commands,
+        projectiles: Query<(Entity, &FixedTimer), With<Self>>,
+    ) {
+        projectiles
+            .contiguous_iter_inner()
+            .unwrap()
+            .for_each(|(entities, timers)| {
+                entities.iter().zip(timers).for_each(|(&entity, timer)| {
+                    if timer.0.is_finished() {
+                        commands.entity(entity).try_despawn();
+                    }
+                });
+            });
+    }
+}
+
+// TODO: Just use delayed commands instead of timers.
+
+/// Trait implemented by marker components attached to specific types of sockets.
+///
+/// A component implementing this trait must require a [`Projectile`].
+pub(super) trait ProjectileKind: Component + Default {
+    const MESH: MeshId;
+    const MATERIAL: MaterialId;
+    const SHAPE: ShapeId;
+    const LIFESPAN: f32;
+}
+
+/// Returns a bundle for spawning a projectile with the marker component `T`.
+pub(super) fn bundle<T: ProjectileKind>(
+    pos: Position,
+    rot: Rotation,
+    shared_meshes: &Res<SharedMeshes>,
+    shared_materials: &Res<SharedMaterials>,
+    shared_shapes: &Res<SharedShapes>,
+) -> (
+    T,
+    Mesh3d,
+    MeshMaterial3d<StandardMaterial>,
+    Collider,
+    Position,
+    Rotation,
+    FixedTimer,
+) {
+    (
+        T::default(),
+        Mesh3d(shared_meshes.get(T::MESH)),
+        MeshMaterial3d(shared_materials.get(T::MATERIAL)),
+        Collider::from(shared_shapes.get(T::SHAPE)),
+        pos,
+        rot,
+        FixedTimer(Timer::new(
+            Duration::from_secs_f32(T::LIFESPAN),
+            TimerMode::Once,
+        )),
+    )
+}
+
+#[derive(Clone, Component, Copy, Default, Eq, PartialEq, Hash)]
+#[require(Projectile)]
+#[component(immutable)]
+pub(super) struct Needle;
+impl ProjectileKind for Needle {
+    const MESH: MeshId = MeshId::ProjectileNeedle;
+    const MATERIAL: MaterialId = MaterialId::Socket;
+    const SHAPE: ShapeId = ShapeId::ProjectileNeedle;
+    const LIFESPAN: f32 = 0.05;
+}
+impl Needle {
+    #[expect(unused, clippy::missing_const_for_fn)]
+    pub(super) fn on_collision_start(event: On<CollisionStart>, mut commands: Commands) {}
+}

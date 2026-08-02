@@ -1,0 +1,4 @@
+[build]
+public_url = "./"
+# minify = "on_release"
+# ^Broken, TODO: Retry with Trunk 22.
