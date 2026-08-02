@@ -89,6 +89,20 @@ pub struct SessionId(pub u8);
 #[derive(Clone, Serialize, Deserialize)]
 struct WorldSave(pub Vec<CreatureSave>);
 
+#[must_use]
+fn save_name(id: u8) -> String {
+    let id = id.to_string();
+
+    cfg_select!(
+        target_family = "wasm" => {{
+            let mut save_name = "zlsave-".to_owned();
+            save_name.push_str(&id);
+            save_name
+        }},
+        _ => id
+    )
+}
+
 /// Saves the current session.
 pub fn sys_save(
     creature_query: Query<(&Children, &Creature, &CreatureKindId)>,
@@ -151,8 +165,7 @@ pub fn sys_save(
     ))
     .unwrap();
 
-    let mut save_name = "zlsave-".to_owned();
-    save_name.push_str(&id.0.to_string());
+    let save_name = save_name(id.0);
 
     cfg_select! {
         target_family = "wasm" => {
@@ -204,7 +217,7 @@ pub fn clear(commands: &mut Commands, creatures: &Query<Entity, With<Creature>>)
 /// Returns whether a saved session exists with `id`.
 #[must_use]
 pub fn exists(id: u8) -> bool {
-    let save_name = id.to_string();
+    let save_name = save_name(id);
 
     cfg_select! {
         target_family = "wasm" => {
@@ -248,7 +261,7 @@ pub fn load(
     id: u8,
 ) {
     let save = {
-        let save_name = id.to_string();
+        let save_name = save_name(id);
 
         postcard::from_bytes::<WorldSave>(&cfg_select! {
             target_family = "wasm" => {
