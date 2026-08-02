@@ -73,6 +73,14 @@ fn main() -> AppExit {
         .add_plugins((
             {
                 let default_plugins = DefaultPlugins
+                    .set({
+                        let mut plugin = TaskPoolPlugin::default();
+                        let options = &mut plugin.task_pool_options;
+                        options.io.max_threads = 1;
+                        options.io.percent = 0.0;
+
+                        plugin
+                    })
                     .set(WindowPlugin {
                         primary_window: Some(Window {
                             title: format!("{WINDOW_TITLE_ROOT} (0)"),
