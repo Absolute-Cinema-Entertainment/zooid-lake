@@ -1,4 +1,13 @@
+trunk_version = "0.21.14"
+
 [build]
+target = "web/index.html"
+release = false
 public_url = "./"
 # minify = "on_release"
 # ^Broken, TODO: Retry with Trunk 22.
+
+[[hooks]]
+stage = "pre_build"
+command = "trunk"
+command_arguments = ["build", "--config", "TrunkFallback.toml"]

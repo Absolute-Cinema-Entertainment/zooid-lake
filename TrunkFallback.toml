@@ -1,0 +1,9 @@
+trunk_version = "0.21.14"
+
+[build]
+target = "web/fallback/index.html"
+release = false
+public_url = "./"
+dist = "dist/fallback"
+# minify = "on_release"
+# ^Broken, TODO: Retry with Trunk 22.

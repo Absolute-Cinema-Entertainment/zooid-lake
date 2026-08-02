@@ -2,6 +2,7 @@
 
 use avian2d::prelude::*;
 use bevy::{
+    asset::AssetMetaCheck,
     audio::{AudioPlugin, SpatialScale},
     picking::PickingSettings,
     prelude::*,
@@ -72,7 +73,8 @@ fn main() -> AppExit {
     App::new()
         .add_plugins((
             {
-                let default_plugins = DefaultPlugins
+                #[allow(unused_mut)]
+                let mut default_plugins = DefaultPlugins
                     .set({
                         let mut plugin = TaskPoolPlugin::default();
                         let options = &mut plugin.task_pool_options;
@@ -107,15 +109,23 @@ fn main() -> AppExit {
                     .set(AudioPlugin {
                         default_spatial_scale: SpatialScale(Vec2::splat(0.05).extend(0.01)),
                         ..default()
+                    })
+                    .set(AssetPlugin {
+                        meta_check: AssetMetaCheck::Never,
+                        #[cfg(all(feature = "webgl2", target_family = "wasm"))]
+                        file_path: "../assets".to_owned(), // The WebGL2 fallback page is a subfolder in the regular web page, where the assets are stored.
+                        ..default()
                     });
 
-                cfg_select! {
-                    any(feature = "debug", target_family = "wasm") => default_plugins,
-                    _ => default_plugins.set(bevy::log::LogPlugin {
+                #[cfg(not(any(feature = "debug", target_family = "wasm")))]
+                {
+                    default_plugins = default_plugins.set(bevy::log::LogPlugin {
                         fmt_layer: log::fmt_layer_to_file,
                         ..default()
-                    })
+                    });
                 }
+
+                default_plugins
             },
             PhysicsPlugins::default().set(PhysicsInterpolationPlugin::interpolate_all()),
             PhysicsPickingPlugin,

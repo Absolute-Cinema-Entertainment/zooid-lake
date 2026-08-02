@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>Zooid Lake</title>
+		<title>Zooid Lake (WebGL2 Fallback)</title>
 		<style>
 			body {
 				margin: 0;
@@ -19,11 +19,12 @@
 		<link
 			data-trunk
 			rel="rust"
+			href="../../Cargo.toml"
 			data-cargo-features="webgl2"
-			data-wasm-opt="4"
+			data-wasm-opt="0"
 			data-wasm-opt-params="--enable-sign-ext --enable-threads --enable-mutable-globals --enable-nontrapping-float-to-int --enable-simd --enable-bulk-memory --enable-bulk-memory-opt --enable-exception-handling --enable-tail-call --enable-reference-types --enable-multivalue --enable-gc --enable-extended-const --enable-strings"
+			data-reference-types
 		/>
-		<link data-trunk rel="copy-dir" href="assets" />
 	</head>
 	<body>
 		<canvas id="bevy"></canvas>
