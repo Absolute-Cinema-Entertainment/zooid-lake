@@ -6,9 +6,4 @@ rustflags = ["-C", "target-cpu=native"]
 
 [target.'cfg(target_os = "linux")']
 linker = "clang"
-rustflags = [
-  "-C",
-  "target-cpu=native",
-  "-C",
-  "link-arg=-fuse-ld=wild"
-]  # Requires Wild 0.9.0+
+rustflags = ["-C", "target-cpu=native", "-C", "link-arg=-fuse-ld=wild"]  # Requires Wild 0.9.0+
