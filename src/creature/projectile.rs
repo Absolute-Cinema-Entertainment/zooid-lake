@@ -96,6 +96,22 @@ impl ProjectileKind for Needle {
     const LIFESPAN: f32 = 0.05;
 }
 impl Needle {
-    #[expect(unused, clippy::missing_const_for_fn)]
-    pub(super) fn on_collision_start(event: On<CollisionStart>, mut commands: Commands) {}
+    pub(super) fn on_collision_start(
+        event: On<CollisionStart>,
+        mut commands: Commands,
+        hearts: Query<&SocketIds, With<part::heart::Heart>>,
+        connected_sockets: Query<(), With<Connected>>,
+    ) {
+        info!("e");
+        // TODO: Maybe we want to do this in [`Projectile`]?
+        if let Ok(heart) = hearts.get_inner(event.collider2) {
+            let socket = *heart.0.first().unwrap();
+
+            if connected_sockets.contains(socket) {
+                commands.queue(DisconnectSocket {
+                    connected_socket: socket,
+                });
+            }
+        }
+    }
 }
