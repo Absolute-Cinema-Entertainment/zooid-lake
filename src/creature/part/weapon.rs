@@ -20,7 +20,7 @@ use crate::{
 #[require(
     CreaturePartKindId::Spear,
     CenterOfMass::ZERO,
-    FixedTimer(Timer::new(Duration::from_secs(2), TimerMode::Once,))
+    FixedTimer(Timer::new(Duration::from_secs(2), TimerMode::Once))
 )]
 pub struct Spear;
 impl CreaturePartKind for Spear {

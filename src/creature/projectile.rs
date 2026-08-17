@@ -5,6 +5,10 @@ use bevy::prelude::*;
 
 use crate::{
     FixedTimer, PhysicsLayers,
+    creature::{
+        connect::{Connected, DisconnectSocket},
+        part::{self, SocketIds},
+    },
     shared_assets::{MaterialId, MeshId, ShapeId, SharedMaterials, SharedMeshes, SharedShapes},
 };
 
@@ -14,7 +18,6 @@ use crate::{
 #[require(
     RigidBody::Dynamic,
     CollisionLayers::new(PhysicsLayers::Damage, PhysicsLayers::Damage),
-    Sensor,
     CollisionEventsEnabled,
     AngularInertia(1.0),
     CenterOfMass::ZERO,
@@ -44,8 +47,6 @@ impl Projectile {
 // TODO: Just use delayed commands instead of timers.
 
 /// Trait implemented by marker components attached to specific types of sockets.
-///
-/// A component implementing this trait must require a [`Projectile`].
 pub(super) trait ProjectileKind: Component + Default {
     const MESH: MeshId;
     const MATERIAL: MaterialId;
@@ -62,6 +63,7 @@ pub(super) fn bundle<T: ProjectileKind>(
     shared_shapes: &Res<SharedShapes>,
 ) -> (
     T,
+    Projectile,
     Mesh3d,
     MeshMaterial3d<StandardMaterial>,
     Collider,
@@ -71,6 +73,7 @@ pub(super) fn bundle<T: ProjectileKind>(
 ) {
     (
         T::default(),
+        Projectile,
         Mesh3d(shared_meshes.get(T::MESH)),
         MeshMaterial3d(shared_materials.get(T::MATERIAL)),
         Collider::from(shared_shapes.get(T::SHAPE)),
@@ -84,7 +87,6 @@ pub(super) fn bundle<T: ProjectileKind>(
 }
 
 #[derive(Clone, Component, Copy, Default, Eq, PartialEq, Hash)]
-#[require(Projectile)]
 #[component(immutable)]
 pub(super) struct Needle;
 impl ProjectileKind for Needle {
